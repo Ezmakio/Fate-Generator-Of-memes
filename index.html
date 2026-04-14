@@ -2,136 +2,165 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Fate Generator Pro Final</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <title>Fate Editor - Pro HUD & Gestures</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        body { margin: 0; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; font-family: 'Noto Sans JP', sans-serif; }
 
+        /* --- VIEWPORT 16:9 --- */
         #fgo-viewport {
             position: relative;
-            width: 100vw;
-            height: 56.25vw; 
-            max-height: 100vh;
-            max-width: 177.78vh;
-            overflow: hidden;
+            width: 100vw; height: 56.25vw; 
+            max-height: 100vh; max-width: 177.78vh;
             background-image: url('https://static.atlasacademy.io/NA/Back/back21100.png');
-            background-size: cover;
-            background-position: center;
+            background-size: cover; background-position: center;
+            overflow: hidden;
+            transition: filter 0.3s ease;
         }
 
-        .asset {
-            position: absolute;
-            background-repeat: no-repeat;
+        #fgo-viewport.blurred { filter: blur(3px) brightness(0.7); }
+
+        .asset { position: absolute; background-repeat: no-repeat; background-size: 100% 100%; }
+
+        /* --- HUD SUPERIOR (SKIP) --- */
+        #skip-btn { 
+            position: absolute; right: 2%; top: 1.5%; width: 9%; height: 7%; z-index: 20; 
+            background: rgba(0, 0, 0, 0.25); backdrop-filter: blur(2px); 
+            border: 3px solid rgba(255, 255, 255, 0.85); border-radius: 50px; 
+            display: flex; justify-content: center; align-items: center; 
+            box-sizing: border-box; opacity: 0.95; cursor: pointer; 
+            padding-left: 0.2vw; padding-bottom: 0.1vw;
+            transition: opacity 0.3s ease;
         }
+        #skip-btn span { display: inline-block; color: rgba(255, 255, 255, 0.95); font-size: 1.8vw; letter-spacing: -0.05em; transform: scaleY(1.3); transform-origin: center; text-shadow: 0 0 2px rgba(0,0,0,0.5); line-height: 1; pointer-events: none;}
+        #skip-btn::after { content: ''; width: 1.8vw; height: 1.8vw; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='0,0 60,50 0,100' fill='rgba(255,255,255,0.95)'/%3E%3Cpolygon points='45,0 100,50 45,100' fill='rgba(255,255,255,0.95)'/%3E%3C/svg%3E"); background-size: contain; display: inline-block; vertical-align: middle; transform: translateY(0.12vw); margin-left: 4px; }
 
-        /* --- INTERFAZ --- */
-        
-       #name-tag { 
-    left: 2.75%; 
-    top: 70.6%;    /* Bajamos el inicio para que la base no se mueva */
-    width: 28.38%; 
-    height: 7%;    /* Reducimos la altura (antes era 9.11%) */
-    z-index: 10;
-    background-image: url('Assets/name_tag_box.png');
-    background-size: 100% 100%;
-    opacity: 0.75;
-}
-
-        #text-box { 
-            left: 2.75%; top: 74.00%; width: 97.13%; height: 22.89%; z-index: 9;
-            background-image: url('Assets/text_box_bg.png');
-            background-size: 100% 100%;
-            opacity: 0.75;
+        /* --- HUD INFERIOR (GRUPO) --- */
+        #hud-bottom-group {
+            position: absolute; width: 100%; height: 100%; top: 0; left: 0;
+            z-index: 10;
+            pointer-events: none; /* Para no bloquear clics al fondo */
+            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
         }
+        #hud-bottom-group > * { pointer-events: auto; }
 
-        #log-icon { 
-            left: 94%; top: 74.44%; width: 2.50%; height: 4.89%; z-index: 10;
-            background-image: url('Assets/log_indicator.png');
-            background-size: 100% 100%;
-            opacity: 0.9;
+        #log-icon { left: 94%; top: 74.44%; width: 2.50%; height: 4.89%; background-image: url('Assets/log_indicator.png'); opacity: 0.9; cursor: pointer; }
+        #auto-btn { left: 93.8%; top: 80.5%; width: 3%; height: 6.5%; background-image: url('Assets/auto_button.png'); opacity: 0.75; transition: all 0.2s; cursor: pointer; }
+        #auto-btn.active { opacity: 1; filter: brightness(1.15) drop-shadow(0 0 6px #00ffff); }
+
+        #name-tag { left: 2.75%; top: 69.6%; width: 30.38%; height: 8%; background-image: url('Assets/name_tag_box.png'); opacity: 0.75; }
+        #text-box { left: 2.75%; top: 74.00%; width: 97.13%; height: 22.89%; background-image: url('Assets/text_box_bg.png'); opacity: 0.75; }
+        #content-name { position: absolute; left: 5%; top: 70.5%; color: #F5F5F5; font-size: 2.2vw; text-shadow: 2px 2px 3px #000; pointer-events: none; }
+        #content-dialogue { position: absolute; left: 6.5%; top: 79.5%; width: 85%; color: #F5F5F5; font-size: 2.2vw; line-height: 1.4; text-shadow: 2px 2px 4px #000; pointer-events: none; }
+
+        /* --- LÓGICA DE OCULTAR --- */
+        .ui-hidden #hud-bottom-group { transform: translateY(30%); }
+        .ui-hidden #skip-btn { opacity: 0 !important; pointer-events: none; }
+
+        /* --- EDITOR (TAB) --- */
+        #editor-overlay {
+            position: fixed; bottom: -320px; left: 50%; transform: translateX(-50%);
+            width: 70%; height: 300px; background: rgba(10, 10, 10, 0.98);
+            backdrop-filter: blur(15px); border-radius: 20px 20px 0 0;
+            border: 2px solid rgba(0, 255, 255, 0.5); z-index: 100;
+            transition: bottom 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            padding: 25px; box-sizing: border-box; display: flex; gap: 25px;
+            box-shadow: 0 -10px 50px rgba(0,255,255,0.2);
         }
-
-   #skip-btn { 
-    left: 87.50%; 
-    top: 0.89%; 
-    width: 12.13%; 
-    height: 8.89%; 
-    z-index: 10;
-    background-image: url('Assets/skip_button.png');
-    background-size: 100% 100%;
-    
-    /* --- ULTRASHARP REFINEMENT --- */
-    /* Borde ultra fino de 0.8px para máxima elegancia */
-    border: 0.8px solid rgba(255, 255, 255, 0.5); 
-    border-radius: 50px; 
-
-    /* Resplandor sutil que suaviza los bordes del asset original */
-    box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.2), 0 0 2px rgba(255, 255, 255, 0.3);
-    
-    /* Filtros para que el azul se vea más vibrante */
-    filter: brightness(1.08) contrast(1.1);
-    
-    /* Forzamos suavizado por hardware para evitar el pixelado */
-    transform: translateZ(0);
-    -webkit-font-smoothing: antialiased;
-    opacity: 0.95;
-}
-
-        #auto-btn { 
-            left: 93.8%; top: 81.5%; width: 3%; height: 6.5%; z-index: 10;
-            background-image: url('Assets/auto_button.png');
-            background-size: contain;
-            background-position: center;
-            opacity: 0.9;
-        }
-
-        /* --- TEXTO RESTAURADO Y SUAVIZADO --- */
-      #content-name {
-    position: absolute;
-    left: 5%;      /* Pegado a la izquierda dentro de su caja */
-    top: 70.5%;    /* Cerca de la parte inferior */
-    width: 22%; 
-    z-index: 11;
-    color: #F5F5F5; 
-    font-family: 'Noto Sans JP', sans-serif;
-    font-weight: 400; 
-    font-size: 2.2vw; 
-    text-align: left; /* Volvemos a alineación a la izquierda */
-    -webkit-text-stroke: 0;
-    text-shadow: 2px 2px 3px rgba(0,0,0,0.9);
-    opacity: 0.92;
-}
-        #content-dialogue {
-            position: absolute;
-            left: 6.5%; top: 79.5%; width: 85%; z-index: 11;
-            /* VOLVEMOS AL BLANCO HUESO LIMPIO */
-            color: #F5F5F5; 
-            font-family: 'Noto Sans JP', sans-serif;
-            font-weight: 400; 
-            font-size: 2.2vw; 
-            line-height: 1.4;
-            letter-spacing: 0.01em;
-            /* SIN BORDE, PERO CON SOMBRA GRUESA */
-            -webkit-text-stroke: 0;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
-            opacity: 0.9; /* Menos opacidad */
-        }
+        #editor-overlay.visible { bottom: 0; }
+        .edit-col { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+        label { font-size: 11px; color: #00ffff; text-transform: uppercase; letter-spacing: 1.5px; font-weight: bold; }
+        input, textarea, select { background: rgba(255,255,255,0.03); border: 1px solid rgba(0, 255, 255, 0.2); color: white; padding: 12px; border-radius: 8px; font-family: inherit; font-size: 14px; }
+        textarea { height: 130px; resize: none; }
+        select option { background-color: #111; color: #00ffff; }
     </style>
 </head>
 <body>
 
     <div id="fgo-viewport">
-        <div id="name-tag" class="asset"></div>
-        <div id="text-box" class="asset"></div>
-        <div id="log-icon" class="asset"></div>
-        <div id="skip-btn" class="asset"></div>
-        <div id="auto-btn" class="asset"></div>
+        <div id="skip-btn"><span>SKIP</span></div>
 
-        <div id="content-name">Jeanne d'Arc Alter</div>
-        <div id="content-dialogue">
-            If you heed the Grail's call, and obey my will and reason, then answer me.
+        <div id="hud-bottom-group">
+            <div id="name-tag" class="asset"></div>
+            <div id="text-box" class="asset"></div>
+            <div id="log-icon" class="asset"></div>
+            <div id="auto-btn" class="asset"></div>
+            <div id="content-name">Jeanne d'Arc Alter</div>
+            <div id="content-dialogue">If you heed the Grail's call, and obey my will and reason, then answer me.</div>
         </div>
     </div>
 
+    <div id="editor-overlay">
+        <div class="edit-col">
+            <label>Escenario</label>
+            <select id="edit-bg">
+                <option value="https://static.atlasacademy.io/NA/Back/back21100.png" selected>Uruk - Noche</option>
+                <option value="https://static.atlasacademy.io/NA/Back/back11000.png">Fuyuki - Llamas</option>
+                <option value="https://static.atlasacademy.io/NA/Back/back40000.png">Londres - Niebla</option>
+                <option value="https://static.atlasacademy.io/NA/Back/back12000.png">Castillo de Nieve</option>
+            </select>
+            <label>Nombre</label>
+            <input type="text" id="edit-name" value="Jeanne d'Arc Alter">
+        </div>
+        <div class="edit-col">
+            <label>Diálogo</label>
+            <textarea id="edit-dialogue">If you heed the Grail's call, and obey my will and reason, then answer me.</textarea>
+        </div>
+    </div>
+
+    <script>
+        const viewport = document.getElementById('fgo-viewport');
+        const editorOverlay = document.getElementById('editor-overlay');
+        const autoBtn = document.getElementById('auto-btn');
+        let startY = 0;
+
+        // --- SISTEMA DE GESTOS (HIDE HUD) ---
+        viewport.addEventListener('mousedown', (e) => {
+            if (editorOverlay.classList.contains('visible')) return;
+            
+            // Si está oculto, cualquier click lo devuelve
+            if (viewport.classList.contains('ui-hidden')) {
+                viewport.classList.remove('ui-hidden');
+                return;
+            }
+            startY = e.clientY;
+        });
+
+        viewport.addEventListener('mouseup', (e) => {
+            if (editorOverlay.classList.contains('visible')) return;
+            if (viewport.classList.contains('ui-hidden')) return;
+
+            let diffY = e.clientY - startY;
+            if (diffY > 60) { // Umbral de arrastre
+                viewport.classList.add('ui-hidden');
+            }
+        });
+
+        // --- SISTEMA DE TAB ---
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                editorOverlay.classList.toggle('visible');
+                viewport.classList.toggle('blurred');
+            }
+        });
+
+        // --- AUTO BUTTON ---
+        autoBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            autoBtn.classList.toggle('active');
+        });
+
+        // --- ACTUALIZACIÓN TIEMPO REAL ---
+        const inputName = document.getElementById('edit-name');
+        const inputDiag = document.getElementById('edit-dialogue');
+        const selectBg = document.getElementById('edit-bg');
+        const dispName = document.getElementById('content-name');
+        const dispDiag = document.getElementById('content-dialogue');
+
+        inputName.addEventListener('input', () => dispName.innerText = inputName.value);
+        inputDiag.addEventListener('input', () => dispDiag.innerText = inputDiag.value);
+        selectBg.addEventListener('change', () => viewport.style.backgroundImage = `url('${selectBg.value}')`);
+    </script>
 </body>
 </html>

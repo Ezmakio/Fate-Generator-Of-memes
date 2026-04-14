@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>NAV - FGO Interface Player</title>
+    <style>
+        body { margin: 0; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+
+        #fgo-viewport {
+            position: relative;
+            width: 100vw;
+            height: 56.25vw; 
+            max-height: 100vh;
+            max-width: 177.78vh;
+            overflow: hidden;
+
+            /* --- FONDO DE PRUEBA (Atlas Academy) --- */
+            background-image: url('https://static.atlasacademy.io/NA/Back/back21100.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .asset {
+            position: absolute;
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+        }
+
+        /* --- RUTAS OPTIMIZADAS PARA GITHUB --- */
+        
+        #name-tag { 
+            left: 0.75%; top: 67.33%; width: 28.38%; height: 9.11%; z-index: 10;
+            background-image: url('Text generator/Assets/name_tag_box.png');
+        }
+
+        #text-box { 
+            left: 2.75%; top: 74.00%; width: 97.13%; height: 22.89%; z-index: 9;
+            background-image: url('Text generator/Assets/text_box_bg.png');
+        }
+
+        #log-icon { 
+            left: 93.75%; top: 74.44%; width: 2.50%; height: 4.89%; z-index: 10;
+            background-image: url('Text generator/Assets/log_indicator.png');
+        }
+
+        #skip-btn { 
+            left: 87.50%; top: 0.89%; width: 12.13%; height: 8.89%; z-index: 10;
+            background-image: url('Text generator/Assets/skip_button.png');
+        }
+
+        #auto-btn { 
+            left: 93.75%; top: 81.11%; width: 4.63%; height: 9.11%; z-index: 10;
+            background-image: url('Text generator/Assets/auto_button.png');
+        }
+
+        /* --- CAPA DE TEXTO --- */
+        #content-name {
+            position: absolute;
+            left: 4%; top: 68.5%; width: 22%; z-index: 11;
+            color: white; font-family: sans-serif; font-weight: bold; font-size: 1.8vw; text-align: center;
+        }
+
+        #content-dialogue {
+            position: absolute;
+            left: 6%; top: 79%; width: 85%; z-index: 11;
+            color: white; font-family: sans-serif; font-size: 2.2vw; line-height: 1.5;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="fgo-viewport">
+        <div id="name-tag" class="asset"></div>
+        <div id="text-box" class="asset"></div>
+        <div id="log-icon" class="asset"></div>
+        <div id="skip-btn" class="asset"></div>
+        <div id="auto-btn" class="asset"></div>
+
+        <div id="content-name">Jeanne d'Arc Alter</div>
+        <div id="content-dialogue">
+            If you heed the Grail's call, and obey my will and reason, then answer me.
+        </div>
+    </div>
+
+</body>
+</html>

@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Fate Generator Pro+</title>
+    <title>Fate Generator Pro Final</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { margin: 0; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
@@ -46,31 +46,29 @@
         }
 
         #skip-btn { 
-            /* RESTAURADO Y CORREGIDO */
             left: 87.50%; top: 0.89%; width: 12.13%; height: 8.89%; z-index: 10;
-            /* Asset oficial de Atlas Academy para un recorte limpio */
-            background-image: url('https://static.atlasacademy.io/NA/Items/Common/6.png');
+            background-image: url('Assets/skip_button.png');
             background-size: 100% 100%;
-            filter: drop-shadow(0px 0px 2px rgba(255,255,255,0.2));
+            /* TRUCO PARA SUAVIZAR LÍNEAS: */
+            image-rendering: -webkit-optimize-contrast;
+            filter: blur(0.2px) drop-shadow(0px 0px 1px rgba(255,255,255,0.1));
         }
 
         #auto-btn { 
-            /* MÁS PEQUEÑO Y MÁS A LA DERECHA */
-            left: 93.8%; top: 82.8%; width: 3%; height: 6.5%; z-index: 10;
+            /* SUBIDO UN POQUITO Y AJUSTADO */
+            left: 93.8%; top: 81.5%; width: 3%; height: 6.5%; z-index: 10;
             background-image: url('Assets/auto_button.png');
-            background-size: contain; /* Asegura que el botón no se deforme */
+            background-size: contain;
             background-position: center;
-            /* Truco para limpiar los bordes claros que mencionas */
             background-origin: content-box;
-            padding: 1px; /* Pequeño margen interno para el recorte */
+            padding: 1px;
         }
 
-        /* --- TEXTO REFINADO CON NOTO SANS JP --- */
+        /* --- TEXTO NOTO SANS JP --- */
         #content-name {
             position: absolute;
             left: 5.5%; top: 68.8%; width: 22%; z-index: 11;
             color: #E0E0E0;
-            /* Usando tu fuente Noto Sans JP (peso Bold para el nombre) */
             font-family: 'Noto Sans JP', sans-serif;
             font-weight: 700; 
             font-size: 1.8vw; 
@@ -82,11 +80,11 @@
             position: absolute;
             left: 6.5%; top: 79.5%; width: 85%; z-index: 11;
             color: #DFDFDF; 
-            /* Usando tu fuente Noto Sans JP (peso Regular para el diálogo) */
             font-family: 'Noto Sans JP', sans-serif;
-            font-weight: 400; /* Menos gruesa */
+            font-weight: 400; 
             font-size: 2.2vw; 
             line-height: 1.4;
+            letter-spacing: 0.01em; /* Un poco más de aire entre letras */
             text-shadow: 2px 2px 3px rgba(0,0,0,0.7);
         }
     </style>

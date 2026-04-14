@@ -24,11 +24,12 @@
             background-repeat: no-repeat;
         }
 
-        /* --- INTERFAZ --- */
+        /* --- INTERFAZ ALINEADA --- */
         
         #name-tag { 
-            left: 0.75%; 
-            top: 68.2%; /* BAJADO (antes 67.33%) */
+            /* Alineado con el borde izquierdo del textbox (2.75%) */
+            left: 2.75%; 
+            top: 68.2%; 
             width: 28.38%; 
             height: 9.11%; 
             z-index: 10;
@@ -69,11 +70,11 @@
             opacity: 0.9;
         }
 
-        /* --- TEXTO (Noto Sans JP) --- */
+        /* --- TEXTO REPOSICIONADO --- */
         #content-name {
             position: absolute;
-            left: 3%; 
-            top: 68.8%; /* Mantenemos la posición del texto */
+            left: 5%; /* Ajustado para estar dentro de la caja movida */
+            top: 68.8%; 
             width: 22%; 
             z-index: 11;
             color: #E0E0E0;

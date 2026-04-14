@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Fate Editor - Pro HUD & Gestures</title>
+    <title>Fate Editor - Artoria Final Integration</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400&display=swap" rel="stylesheet">
     <style>
         body { margin: 0; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; font-family: 'Noto Sans JP', sans-serif; }
@@ -17,10 +17,39 @@
             overflow: hidden;
             transition: filter 0.3s ease;
         }
-
         #fgo-viewport.blurred { filter: blur(3px) brightness(0.7); }
 
         .asset { position: absolute; background-repeat: no-repeat; background-size: 100% 100%; }
+
+        /* --- CAPA DE PERSONAJE (ARTORIA) --- */
+        #sprite-layer {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: flex-end;
+            z-index: 5; pointer-events: none;
+        }
+     #char-sprite {
+    /* Mantenemos la proporción del archivo original (1024x1280) */
+    width: 100%; 
+    height: 125%; /* Un poco más de altura para maniobrar con el escalado */
+    
+    background-image: url('https://static.atlasacademy.io/NA/CharaFigure/1001000/1001000_merged.png');
+    background-repeat: no-repeat;
+    background-position: center top;
+    background-size: contain;
+
+    /* Recorte del cuerpo (Body height: 769) */
+    /* Usamos un valor porcentual exacto basado en 769/1280 ≈ 60.08% */
+    clip-path: inset(0 0 39.92% 0); 
+    
+    /* --- ESCALADO PROPORCIONAL --- */
+    /* Al subir la escala a 1.8, Artoria se ve mucho más cerca.
+       El 40% de translateY la deja perfectamente apoyada tras el HUD. */
+    transform: translateY(0%) scale(1.7);
+    transform-origin: center top; /* Importante: escala desde la cabeza/centro */
+    
+    transition: all 0.4s ease;
+    position: relative; /* Preparado para contener la cara en absolute después */
+}
 
         /* --- HUD SUPERIOR (SKIP) --- */
         #skip-btn { 
@@ -38,8 +67,7 @@
         /* --- HUD INFERIOR (GRUPO) --- */
         #hud-bottom-group {
             position: absolute; width: 100%; height: 100%; top: 0; left: 0;
-            z-index: 10;
-            pointer-events: none; /* Para no bloquear clics al fondo */
+            z-index: 10; pointer-events: none;
             transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
         }
         #hud-bottom-group > * { pointer-events: auto; }
@@ -50,6 +78,8 @@
 
         #name-tag { left: 2.75%; top: 69.6%; width: 30.38%; height: 8%; background-image: url('Assets/name_tag_box.png'); opacity: 0.75; }
         #text-box { left: 2.75%; top: 74.00%; width: 97.13%; height: 22.89%; background-image: url('Assets/text_box_bg.png'); opacity: 0.75; }
+        
+        /* RESTAURADOS FORMATOS DE TEXTO */
         #content-name { position: absolute; left: 5%; top: 70.5%; color: #F5F5F5; font-size: 2.2vw; text-shadow: 2px 2px 3px #000; pointer-events: none; }
         #content-dialogue { position: absolute; left: 6.5%; top: 79.5%; width: 85%; color: #F5F5F5; font-size: 2.2vw; line-height: 1.4; text-shadow: 2px 2px 4px #000; pointer-events: none; }
 
@@ -59,8 +89,8 @@
 
         /* --- EDITOR (TAB) --- */
         #editor-overlay {
-            position: fixed; bottom: -320px; left: 50%; transform: translateX(-50%);
-            width: 70%; height: 300px; background: rgba(10, 10, 10, 0.98);
+            position: fixed; bottom: -350px; left: 50%; transform: translateX(-50%);
+            width: 70%; height: 320px; background: rgba(10, 10, 10, 0.98);
             backdrop-filter: blur(15px); border-radius: 20px 20px 0 0;
             border: 2px solid rgba(0, 255, 255, 0.5); z-index: 100;
             transition: bottom 0.5s cubic-bezier(0.23, 1, 0.32, 1);
@@ -74,10 +104,14 @@
         textarea { height: 130px; resize: none; }
         select option { background-color: #111; color: #00ffff; }
     </style>
-</head>
+ head>
 <body>
 
     <div id="fgo-viewport">
+        <div id="sprite-layer">
+            <div id="char-sprite"></div>
+        </div>
+
         <div id="skip-btn"><span>SKIP</span></div>
 
         <div id="hud-bottom-group">
@@ -85,8 +119,8 @@
             <div id="text-box" class="asset"></div>
             <div id="log-icon" class="asset"></div>
             <div id="auto-btn" class="asset"></div>
-            <div id="content-name">Jeanne d'Arc Alter</div>
-            <div id="content-dialogue">If you heed the Grail's call, and obey my will and reason, then answer me.</div>
+            <div id="content-name">Artoria Pendragon</div>
+            <div id="content-dialogue">I ask of you. Are you my Master?</div>
         </div>
     </div>
 
@@ -97,14 +131,15 @@
                 <option value="https://static.atlasacademy.io/NA/Back/back21100.png" selected>Uruk - Noche</option>
                 <option value="https://static.atlasacademy.io/NA/Back/back11000.png">Fuyuki - Llamas</option>
                 <option value="https://static.atlasacademy.io/NA/Back/back40000.png">Londres - Niebla</option>
-                <option value="https://static.atlasacademy.io/NA/Back/back12000.png">Castillo de Nieve</option>
             </select>
-            <label>Nombre</label>
-            <input type="text" id="edit-name" value="Jeanne d'Arc Alter">
+            <label>Sprite (URL)</label>
+            <input type="text" id="edit-sprite" value="https://static.atlasacademy.io/NA/CharaFigure/1001000/1001000_merged.png">
         </div>
         <div class="edit-col">
+            <label>Nombre</label>
+            <input type="text" id="edit-name" value="Artoria Pendragon">
             <label>Diálogo</label>
-            <textarea id="edit-dialogue">If you heed the Grail's call, and obey my will and reason, then answer me.</textarea>
+            <textarea id="edit-dialogue">I ask of you. Are you my Master?</textarea>
         </div>
     </div>
 
@@ -112,28 +147,26 @@
         const viewport = document.getElementById('fgo-viewport');
         const editorOverlay = document.getElementById('editor-overlay');
         const autoBtn = document.getElementById('auto-btn');
+        const charSprite = document.getElementById('char-sprite');
         let startY = 0;
+        let uiJustRestored = false;
 
         // --- SISTEMA DE GESTOS (HIDE HUD) ---
         viewport.addEventListener('mousedown', (e) => {
             if (editorOverlay.classList.contains('visible')) return;
-            
-            // Si está oculto, cualquier click lo devuelve
             if (viewport.classList.contains('ui-hidden')) {
                 viewport.classList.remove('ui-hidden');
+                uiJustRestored = true;
                 return;
             }
+            uiJustRestored = false;
             startY = e.clientY;
         });
 
         viewport.addEventListener('mouseup', (e) => {
-            if (editorOverlay.classList.contains('visible')) return;
-            if (viewport.classList.contains('ui-hidden')) return;
-
+            if (editorOverlay.classList.contains('visible') || uiJustRestored) return;
             let diffY = e.clientY - startY;
-            if (diffY > 60) { // Umbral de arrastre
-                viewport.classList.add('ui-hidden');
-            }
+            if (diffY > 60) viewport.classList.add('ui-hidden');
         });
 
         // --- SISTEMA DE TAB ---
@@ -145,22 +178,12 @@
             }
         });
 
-        // --- AUTO BUTTON ---
-        autoBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            autoBtn.classList.toggle('active');
-        });
-
         // --- ACTUALIZACIÓN TIEMPO REAL ---
-        const inputName = document.getElementById('edit-name');
-        const inputDiag = document.getElementById('edit-dialogue');
-        const selectBg = document.getElementById('edit-bg');
-        const dispName = document.getElementById('content-name');
-        const dispDiag = document.getElementById('content-dialogue');
-
-        inputName.addEventListener('input', () => dispName.innerText = inputName.value);
-        inputDiag.addEventListener('input', () => dispDiag.innerText = inputDiag.value);
-        selectBg.addEventListener('change', () => viewport.style.backgroundImage = `url('${selectBg.value}')`);
+        document.getElementById('edit-name').addEventListener('input', (e) => document.getElementById('content-name').innerText = e.target.value);
+        document.getElementById('edit-dialogue').addEventListener('input', (e) => document.getElementById('content-dialogue').innerText = e.target.value);
+        document.getElementById('edit-bg').addEventListener('change', (e) => viewport.style.backgroundImage = `url('${e.target.value}')`);
+        document.getElementById('edit-sprite').addEventListener('input', (e) => charSprite.style.backgroundImage = `url('${e.target.value}')`);
+        autoBtn.addEventListener('click', (e) => { e.stopPropagation(); autoBtn.classList.toggle('active'); });
     </script>
 </body>
 </html>

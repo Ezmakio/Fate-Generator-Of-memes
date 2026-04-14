@@ -51,16 +51,15 @@
             opacity: 0.9;
         }
 
-        #skip-btn { 
-            left: 87.50%; top: 0.89%; width: 12.13%; height: 8.89%; z-index: 10;
-            background-image: url('Assets/skip_button.png');
-            background-size: 100% 100%;
-            /* Suavizado mejorado para lines suaves */
-            image-rendering: -webkit-optimize-contrast;
-            filter: blur(0.15px) contrast(1.05);
-            transform: scale(0.96);
-            opacity: 0.95;
-        }
+       #skip-btn { 
+    left: 87.50%; top: 0.89%; width: 12.13%; height: 8.89%; z-index: 10;
+    background-image: url('Assets/skip_button.png');
+    background-size: 100% 100%;
+    /* Truco maestro para bordes suaves */
+    filter: drop-shadow(0 0 1px rgba(255,255,255,0.1)) brightness(1.05);
+    transform: perspective(1px) translateZ(0); 
+    backface-visibility: hidden;
+}
 
         #auto-btn { 
             left: 93.8%; top: 81.5%; width: 3%; height: 6.5%; z-index: 10;

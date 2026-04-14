@@ -26,17 +26,16 @@
 
         /* --- INTERFAZ --- */
         
-        #name-tag { 
-            /* Volvemos a la alineación centrada del tag */
-            left: 0.75%; 
-            top: 68.5%; 
-            width: 28.38%; 
-            height: 9.11%; 
-            z-index: 10;
-            background-image: url('Assets/name_tag_box.png');
-            background-size: 100% 100%;
-            opacity: 0.75;
-        }
+       #name-tag { 
+    left: 2.75%; /* Alineado con el borde del textbox */
+    top: 68.5%;  /* La posición bajadita que pediste */
+    width: 28.38%; 
+    height: 9.11%; 
+    z-index: 10;
+    background-image: url('Assets/name_tag_box.png');
+    background-size: 100% 100%;
+    opacity: 0.75;
+}
 
         #text-box { 
             left: 2.75%; top: 74.00%; width: 97.13%; height: 22.89%; z-index: 9;
@@ -72,25 +71,21 @@
         }
 
         /* --- TEXTO RESTAURADO Y SUAVIZADO --- */
-        #content-name {
-            position: absolute;
-            left: 0.75%; 
-            top: 70.5%; 
-            /* Centrado horizontalmente en la caja */
-            width: 28.38%; 
-            z-index: 11;
-            /* VOLVEMOS AL BLANCO HUESO LIMPIO */
-            color: #F5F5F5; 
-            font-family: 'Noto Sans JP', sans-serif;
-            font-weight: 400; 
-            font-size: 2.2vw; 
-            text-align: center; /* Centrado */
-            /* SIN BORDE, PERO CON SOMBRA GRUESA */
-            -webkit-text-stroke: 0;
-            text-shadow: 2px 2px 3px rgba(0,0,0,0.9);
-            opacity: 0.92; /* Menos opacidad para que resalte */
-        }
-
+      #content-name {
+    position: absolute;
+    left: 5%;      /* Pegado a la izquierda dentro de su caja */
+    top: 70.5%;    /* Cerca de la parte inferior */
+    width: 22%; 
+    z-index: 11;
+    color: #F5F5F5; 
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 400; 
+    font-size: 2.2vw; 
+    text-align: left; /* Volvemos a alineación a la izquierda */
+    -webkit-text-stroke: 0;
+    text-shadow: 2px 2px 3px rgba(0,0,0,0.9);
+    opacity: 0.92;
+}
         #content-dialogue {
             position: absolute;
             left: 6.5%; top: 79.5%; width: 85%; z-index: 11;
